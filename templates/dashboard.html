@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #337ab7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f8f9fa;
+    }
+    .logout-btn {
+      background-color: #d9534f;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      float: right;
+    }
+    .logout-btn:hover {
+      background-color: #c9302c;
+    }
+    .download-btn {
+      background-color: #5cb85c;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-bottom: 20px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .download-btn:hover {
+      background-color: #4cae4c;
+    }
+    /* Modal Styling */
+    #anonymizeModal {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      background: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    #anonymizeModal h3 {
+      text-align: center;
+    }
+    #anonymizeModal select, #anonymizeModal button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/logout" class="logout-btn">Logout</a>
+  <h2>All Donor Records</h2>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <button class="download-btn" onclick="openAnonymizePopup()">Download Anonymized Data</button>
+</div>
+
+<!-- Popup Modal -->
+<div id="anonymizeModal">
+  <h3>Select Anonymization Method</h3>
+
+  <form id="anonymizeForm" method="POST" action="/anonymize/options">
+    <select id="methodSelect" name="method" required onchange="showKOrLInput()">
+      <option value="">--Select Method--</option>
+      <option value="k">K-Anonymity</option>
+      <option value="l">L-Diversity</option>
+      <option value="masking">Data Masking</option>
+    </select>
+
+    <div id="dynamicInput" style="margin-top: 10px;"></div>
+
+    <button type="submit" style="margin-top: 10px;">Proceed</button>
+    <button type="button" onclick="closeAnonymizePopup()" style="margin-top: 10px;">Cancel</button>
+  </form>
+</div>
+
+  <!-- Donor Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Blood Group</th>
+        <th>Mobile</th>
+        <th>City</th>
+        <th>ZIP Code</th>
+        <th>State</th>
+        <th>Donation Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for donor in donors %}
+      <tr>
+        <td>{{ donor[1] }}</td>
+        <td>{{ donor[2] }}</td>
+        <td>{{ donor[3] }}</td>
+        <td>{{ donor[4] }}</td>
+        <td>{{ donor[5] }}</td>
+        <td>{{ donor[6] }}</td>
+        <td>{{ donor[7] }}</td>
+        <td>{{ donor[8] }}</td>
+        <td>{{ donor[9] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+<!-- JavaScript for Modal -->
+<script>
+  function openAnonymizePopup() {
+    document.getElementById('anonymizeModal').style.display = 'block';
+  }
+  
+  function closeAnonymizePopup() {
+    document.getElementById('anonymizeModal').style.display = 'none';
+  }
+  
+  // Show dynamic K or L input based on method selected
+  function showKOrLInput() {
+    const method = document.getElementById('methodSelect').value;
+    const inputDiv = document.getElementById('dynamicInput');
+  
+    inputDiv.innerHTML = ''; // Reset first
+  
+    if (method === 'k') {
+      inputDiv.innerHTML = `
+        <label>Enter value of K:</label><br>
+        <input type="number" name="k_value" min="1" required>
+      `;
+    } else if (method === 'l') {
+      inputDiv.innerHTML = `
+        <label>Enter value of L:</label><br>
+        <input type="number" name="l_value" min="1" required>
+      `;
+    }
+  }
+  </script>
+
+</body>
+</html>

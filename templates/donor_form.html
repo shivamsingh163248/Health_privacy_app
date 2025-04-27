@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blood Donation Registration</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      color: #d9534f;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #d9534f;
+      color: white;
+      padding: 10px 15px;
+      margin-top: 20px;
+      border: none;
+      width: 100%;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c9302c;
+    }
+    .flash-message {
+      text-align: center;
+      padding: 10px;
+      background-color: #dff0d8;
+      color: #3c763d;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Blood Donation Form</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="/donor/register" method="POST">
+      <label>Name:</label>
+      <input type="text" name="name" required>
+
+      <label>Age:</label>
+      <input type="number" name="age" required>
+
+      <label>Email:</label>
+      <input type="email" name="email" required>
+
+      <label>Blood Group:</label>
+      <input type="text" name="blood_group" required>
+
+      <label>Mobile Number:</label>
+      <input type="text" name="mobile" required>
+
+      <label>City:</label>
+      <input type="text" name="city" required>
+
+      <label>ZIP Code:</label>
+      <input type="text" name="zip_code" required>
+
+      <label>State:</label>
+      <input type="text" name="state" required>
+
+      <label>Donation Date:</label>
+      <input type="date" name="donation_date" required>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+</body>
+</html>
