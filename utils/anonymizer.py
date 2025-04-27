@@ -21,19 +21,59 @@ def mask_email(email):
     except:
         return "xxxx@domain.com"
 
+def mask_mobile(mobile):
+    try:
+        mobile = str(mobile)
+        return mobile[:4] + "******"
+    except:
+        return "**********"
+
+def mask_zip(zip_code):
+    try:
+        zip_code = str(zip_code)
+        return zip_code[:3] + "**"
+    except:
+        return "*****"
+
+def mask_blood_group(blood_group):
+    try:
+        blood_group = str(blood_group)
+        return "Group_*"
+    except:
+        return "Group_*"
+
+def mask_city(city):
+    return "City_***"
+
+def mask_state(state):
+    return "State_***"
+
+def mask_donation_date(donation_date):
+    try:
+        # Example: 2023-03-12 --> 2023-03
+        return str(donation_date)[:7]
+    except:
+        return "2023-XX"
+
 def generalize_column(df, column):
     if column == 'name':
         return df[column].apply(lambda x: f"Name_{x[0].upper()}***" if pd.notna(x) and len(str(x)) > 0 else "Name_***")
     elif column == 'age':
         return df[column].apply(generalize_age)
-    elif column == 'city':
-        return df[column].apply(lambda x: "City_***")
-    elif column == 'state':
-        return df[column].apply(lambda x: "State_***")
-    elif column == 'mobile':
-        return df[column].astype(str).apply(lambda x: x[:4] + "******")
     elif column == 'email':
         return df[column].apply(mask_email)
+    elif column == 'mobile':
+        return df[column].apply(mask_mobile)
+    elif column == 'zip_code':
+        return df[column].apply(mask_zip)
+    elif column == 'blood_group':
+        return df[column].apply(mask_blood_group)
+    elif column == 'city':
+        return df[column].apply(mask_city)
+    elif column == 'state':
+        return df[column].apply(mask_state)
+    elif column == 'donation_date':
+        return df[column].apply(mask_donation_date)
     else:
         return df[column]
 
