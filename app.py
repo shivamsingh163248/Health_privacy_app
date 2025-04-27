@@ -80,10 +80,12 @@ def admin_dashboard():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM donors")
     donors = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]  # <-- Get column names dynamically
     cursor.close()
     conn.close()
 
-    return render_template('dashboard.html', donors=donors)
+    return render_template('dashboard.html', donors=donors, columns=columns)
+
 
 
 @app.route('/anonymize/options', methods=['POST'])
@@ -94,12 +96,18 @@ def anonymize_options():
     method = request.form.get('method')
     k_value = request.form.get('k_value')
     l_value = request.form.get('l_value')
+    selected_columns = request.form.getlist('columns')  # <-- Capture checked columns
 
     if method not in ['k', 'l', 'masking']:
         flash("Invalid method selected!", "danger")
         return redirect('/admin/dashboard')
 
+    if not selected_columns:
+        flash("Please select at least one column.", "danger")
+        return redirect('/admin/dashboard')
+
     session['anonymization_method'] = method
+    session['selected_columns'] = selected_columns  # <-- Save columns in session
 
     if method == 'k' and k_value:
         session['k_value'] = int(k_value)
@@ -107,6 +115,7 @@ def anonymize_options():
         session['l_value'] = int(l_value)
 
     return redirect('/anonymize/preview')
+
 
 
 from utils.anonymizer import apply_k_anonymity, apply_l_diversity, apply_data_masking
@@ -117,8 +126,9 @@ def anonymize_preview():
         return redirect('/login')
 
     method = session.get('anonymization_method')
-    if not method:
-        flash("No method selected.", "danger")
+    selected_columns = session.get('selected_columns')
+    if not method or not selected_columns:
+        flash("Missing anonymization settings.", "danger")
         return redirect('/admin/dashboard')
 
     conn = get_connection()
@@ -137,11 +147,11 @@ def anonymize_preview():
     l_value = session.get('l_value', 1)
 
     if method == 'k':
-        anonymized_df = apply_k_anonymity(df, selected_columns=['name', 'age', 'city', 'state'], k=k_value)
+        anonymized_df = apply_k_anonymity(df, selected_columns=selected_columns, k=k_value)
     elif method == 'l':
-        anonymized_df = apply_l_diversity(df, selected_columns=['name', 'age', 'city'], k=k_value, l=l_value)
+        anonymized_df = apply_l_diversity(df, selected_columns=selected_columns, k=k_value, l=l_value)
     elif method == 'masking':
-        anonymized_df = apply_data_masking(df, selected_columns=['name', 'email', 'mobile', 'city'])
+        anonymized_df = apply_data_masking(df, selected_columns=selected_columns)
 
     import os
     if not os.path.exists('outputs'):
@@ -152,6 +162,7 @@ def anonymize_preview():
     preview_html = anonymized_df.head(10).to_html(classes="table table-bordered", index=False)
 
     return render_template('preview.html', preview_html=preview_html)
+
 
 from flask import send_file
 

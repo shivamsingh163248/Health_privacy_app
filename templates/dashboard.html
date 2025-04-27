@@ -97,7 +97,7 @@
 </div>
 
 <!-- Popup Modal -->
-<div id="anonymizeModal">
+<!-- <div id="anonymizeModal">
   <h3>Select Anonymization Method</h3>
 
   <form id="anonymizeForm" method="POST" action="/anonymize/options">
@@ -113,7 +113,34 @@
     <button type="submit" style="margin-top: 10px;">Proceed</button>
     <button type="button" onclick="closeAnonymizePopup()" style="margin-top: 10px;">Cancel</button>
   </form>
+</div> -->
+<!-- Popup Modal -->
+<div id="anonymizeModal">
+  <h3>Select Anonymization Method</h3>
+
+  <form id="anonymizeForm" method="POST" action="/anonymize/options">
+    <select id="methodSelect" name="method" required onchange="showKOrLInput()">
+      <option value="">--Select Method--</option>
+      <option value="k">K-Anonymity</option>
+      <option value="l">L-Diversity</option>
+      <option value="masking">Data Masking</option>
+    </select>
+
+    <div id="dynamicInput" style="margin-top: 10px;"></div>
+
+    <!-- Dynamic Columns Checkbox -->
+    <div id="columnSelection" style="margin-top: 20px;">
+      <h4>Select Columns to Anonymize:</h4>
+      {% for col in columns %}
+        <input type="checkbox" name="columns" value="{{ col }}"> {{ col }}<br>
+      {% endfor %}
+    </div>
+
+    <button type="submit" style="margin-top: 10px;">Proceed</button>
+    <button type="button" onclick="closeAnonymizePopup()" style="margin-top: 10px;">Cancel</button>
+  </form>
 </div>
+
 
   <!-- Donor Table -->
   <table>
