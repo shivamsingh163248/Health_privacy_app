@@ -166,12 +166,34 @@ def anonymize_preview():
 
 from flask import send_file
 
+from datetime import datetime
+from flask import send_file, after_this_request
+
 @app.route('/anonymize/download')
 def anonymize_download():
     if not session.get('admin_logged_in'):
         return redirect('/login')
 
-    return send_file('outputs/anonymized.csv', as_attachment=True)
+    # Generate timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    new_filename = f'outputs/anonymized_{timestamp}.csv'
+
+    # Copy the last saved anonymized.csv to timestamped filename
+    import shutil
+    shutil.copy('outputs/anonymized.csv', new_filename)
+
+    # After sending the file, clear session variables
+    @after_this_request
+    def clear_session(response):
+        session.pop('anonymization_method', None)
+        session.pop('selected_columns', None)
+        session.pop('k_value', None)
+        session.pop('l_value', None)
+        return response
+
+    flash('Anonymized file downloaded successfully!', 'success')
+    return send_file(new_filename, as_attachment=True)
+
 
 
 

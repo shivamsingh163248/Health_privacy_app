@@ -88,6 +88,19 @@
 </head>
 <body>
 
+  
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="text-align:center; margin-top:10px;">
+          {% for category, message in messages %}
+            <div style="color: green; font-weight: bold;">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+
 <div class="container">
   <a href="/logout" class="logout-btn">Logout</a>
   <h2>All Donor Records</h2>
@@ -136,8 +149,9 @@
       {% endfor %}
     </div>
 
-    <button type="submit" style="margin-top: 10px;">Proceed</button>
-    <button type="button" onclick="closeAnonymizePopup()" style="margin-top: 10px;">Cancel</button>
+    <button type="submit" style="margin-top: 10px; background-color: #5cb85c; color:white;">Proceed</button>
+    <button type="button" onclick="closeAnonymizePopup()" style="margin-top: 10px; background-color: #d9534f; color:white;">Cancel</button>
+
   </form>
 </div>
 
