@@ -5,6 +5,11 @@ from config import SECRET_KEY
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+
 @app.route('/donor/register', methods=['GET', 'POST'])
 def donor_register():
     if request.method == 'POST':
@@ -199,4 +204,4 @@ def anonymize_download():
 
 # Always put this LAST
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=3000)

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shielded Health: Ensuring Data Confidentiality</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .hero {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .hero img {
+            width: 250px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons a {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+        .buttons a.login-btn {
+            background-color: #007bff;
+        }
+        .buttons a:hover {
+            background-color: #0069d9;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Shielded Health: Ensuring Data Confidentiality</h1>
+</header>
+
+<div class="hero">
+    <img src="{{ url_for('static', filename='images/healthcare.jpg') }}" alt="Healthcare">
+    <h1>Protecting Patient Data with K-Anonymity, L-Diversity, and Data Masking</h1>
+    <p>Secure your healthcare records while preserving research value.</p>
+
+    <div class="buttons">
+        <a href="/donor/register">Submit Donation Form</a>
+        <a href="/login" class="login-btn">Admin Login</a>
+    </div>
+</div>
+
+<footer>
+    &copy; 2024 Shielded Health | Privacy First | Powered by Flask & MySQL
+</footer>
+
+</body>
+</html>

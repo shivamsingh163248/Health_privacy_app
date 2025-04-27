@@ -1,0 +1,13 @@
+Flask
+mysql-connector-python
+pandas
+numpy
+requests
+beautifulsoup4
+flask-cors
+Flask
+mysql-connector-python
+pandas
+flask-cors
+gunicorn
+
