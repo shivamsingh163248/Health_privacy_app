@@ -122,8 +122,6 @@ docker rm <container_id>
 
 ---
 
-adding another
-
 # Author
 
 Maintained by [shivamsingh163248](https://hub.docker.com/u/shivamsingh163248)
