@@ -1,0 +1,73 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+venv/
+ENV/
+env/
+pip-log.txt
+
+# ---- Flask ----
+instance/
+*.db
+*.sqlite
+*.log
+*.pot
+*.pyc
+
+# ---- Environment Variables ----
+.env
+.env.*
+secrets.*
+config.yaml
+*.pem
+*.key
+*.crt
+
+# ---- Terraform ----
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+terraform.tfvars
+*.backup
+
+# ---- VSCode & IDEs ----
+.vscode/
+.idea/
+*.swp
+
+# ---- Node / Frontend (if any JS) ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- OS & Misc ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Git filter-repo backup ----
+.git-rewrite/
+
+# ---- Logs and Dumps ----
+*.log
+*.out
+*.pid
+*.gz
+*.zip
+
+# ---- MySQL dumps ----
+*.sql
+*.dump
+
+# ---- Other Binary Files ----
+*.exe
+*.bin
+
+# ---- Docker (optional if using) ----
+*.tar
