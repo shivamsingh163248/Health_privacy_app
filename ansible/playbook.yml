@@ -1,0 +1,31 @@
+- name: Configure EC2 and Deploy Docker App
+  hosts: web
+  become: true
+
+  tasks:
+  - name: Update APT
+    apt:
+      update_cache: yes
+
+  - name: Install Docker
+    apt:
+      name: docker.io
+      state: present
+
+  - name: Enable and start Docker
+    systemd:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: Add ubuntu user to docker group
+    user:
+      name: ubuntu
+      groups: docker
+      append: yes
+
+  - name: Pull Docker image
+    command: docker pull shivamsingh163248/health_privacy_app:v2
+
+  - name: Run Docker container
+    command: docker run -d -p 80:3000 --restart always shivamsingh163248/health_privacy_app:v2
