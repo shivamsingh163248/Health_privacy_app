@@ -46,21 +46,10 @@ resource "aws_security_group" "docker_sg" {
 }
 
 resource "aws_instance" "docker_server" {
-  ami                    = "ami-0c7217cdde317cfec"
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.deployer.key_name
-  security_groups        = [aws_security_group.docker_sg.name]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              apt update -y
-              apt install -y docker.io
-              systemctl start docker
-              systemctl enable docker
-              usermod -aG docker ubuntu
-              docker pull shivamsingh163248/health_privacy_app:v2
-              docker run -d -p 80:3000 --restart always shivamsingh163248/health_privacy_app:v2
-              EOF
+  ami                         = "ami-0c7217cdde317cfec"
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.deployer.key_name
+  vpc_security_group_ids      = [aws_security_group.docker_sg.id]
 
   tags = {
     Name = "Docker-Health-App-Server"
