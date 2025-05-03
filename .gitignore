@@ -72,3 +72,10 @@ desktop.ini
 
 # ---- Docker (optional if using) ----
 *.tar
+
+terraform/terraform.tfstate
+terraform/terraform.tfstate.*
+terraform/.terraform/
+terraform/terraform.tfvars
+ansible/inventory.ini
+
