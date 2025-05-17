@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')     // Replace with your real Jenkins credential ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Replace with your real Jenkins credential ID
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')     // Jenkins credentials ID
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Jenkins credentials ID
     }
 
     stages {
@@ -18,9 +18,13 @@ pipeline {
         stage('Terraform Init & Apply') {
             steps {
                 echo '🚀 Initializing and applying Terraform...'
-                dir('terraform') { // if terraform files are inside a folder named "terraform"
+                dir('terraform') {
                     sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
+                    sh '''
+                        terraform apply -auto-approve \
+                        -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
+                        -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
+                    '''
                 }
             }
         }
