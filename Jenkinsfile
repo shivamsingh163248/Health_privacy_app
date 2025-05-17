@@ -2,59 +2,59 @@ pipeline {
     agent any
 
     environment {
-        TF_DIR = "terraform"
-        ANSIBLE_DIR = "ansible"
-        SSH_KEY = credentials('jenkins-ssh-key') // ID of your SSH key in Jenkins credentials
+        TF_VAR_aws_access_key = credentials('aws-access-key')   // AWS Key from Jenkins Credentials
+        TF_VAR_aws_secret_key = credentials('aws-secret-key')   // AWS Secret from Jenkins Credentials
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/shivamsingh163248/Health_privacy_app.git'
+                checkout scm
             }
         }
 
         stage('Terraform Init & Apply') {
-            steps {
-                dir("${TF_DIR}") {
+            dir('terraform') {
+                steps {
                     sh 'terraform init'
                     sh 'terraform apply -auto-approve'
                 }
             }
         }
 
-        stage('Fetch EC2 IP') {
+        stage('Extract EC2 Public IP') {
             steps {
                 script {
-                    def ec2_ip = sh(
-                        script: "cd ${TF_DIR} && terraform output -raw ec2_public_ip",
+                    env.PUBLIC_IP = sh(
+                        script: "cd terraform && terraform output -raw ec2_public_ip",
                         returnStdout: true
                     ).trim()
-                    env.EC2_PUBLIC_IP = ec2_ip
                 }
             }
         }
 
-        stage('Configure Server with Ansible') {
+        stage('Generate Ansible Inventory') {
             steps {
-                dir("${ANSIBLE_DIR}") {
-                    // Create inventory
-                    writeFile file: 'inventory.ini', text: """[web]
-${env.EC2_PUBLIC_IP} ansible_user=ubuntu ansible_ssh_private_key_file=${env.SSH_KEY}"""
+                sh '''
+                    echo "[web]" > ansible/inventory.ini
+                    echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+                '''
+            }
+        }
 
-                    // Run playbook
-                    sh 'ansible-playbook -i inventory.ini playbook.yml'
-                }
+        stage('Run Ansible Playbook') {
+            steps {
+                sh 'ansible-playbook -i ansible/inventory.ini ansible/playbook.yml'
             }
         }
     }
 
     post {
         success {
-            echo "🎉 Deployment successful!"
+            echo "✅ Deployment Successful!"
         }
         failure {
-            echo "❌ Deployment failed."
+            echo "❌ Deployment Failed!"
         }
     }
 }
