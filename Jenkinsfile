@@ -2,57 +2,28 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')     // Jenkins credentials ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key') // Jenkins credentials ID
+        TF_WORKING_DIR = "terraform"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git 'https://github.com/shivamsingh163248/Health_privacy_app.git'
             }
         }
 
         stage('Terraform Init & Apply') {
+            environment {
+                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+            }
             steps {
-                dir('terraform') {
-                    sh 'terraform init'
-                    sh """
-                        terraform apply -auto-approve \
-                        -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
-                        -var "aws_secret_key=$AWS_SECRET_ACCESS_KEY"
-                    """
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        terraform init
+                        terraform apply -auto-approve
+                    '''
                 }
-            }
-        }
-
-        stage('Extract EC2 Public IP') {
-            when {
-                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-            }
-            steps {
-                echo "Extracting public IP..."
-                // Add your script here
-            }
-        }
-
-        stage('Generate Ansible Inventory') {
-            when {
-                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-            }
-            steps {
-                echo "Generating Ansible inventory..."
-                // Add your script here
-            }
-        }
-
-        stage('Run Ansible Playbook') {
-            when {
-                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-            }
-            steps {
-                echo "Running Ansible playbook..."
-                // Add your script here
             }
         }
     }
