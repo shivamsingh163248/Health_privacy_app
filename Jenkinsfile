@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')     // Jenkins credentials ID
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key') // Jenkins credentials ID
     }
 
     stages {
@@ -17,45 +17,52 @@ pipeline {
             steps {
                 dir('terraform') {
                     sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
+                    sh """
+                        terraform apply -auto-approve \
+                        -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
+                        -var "aws_secret_key=$AWS_SECRET_ACCESS_KEY"
+                    """
                 }
             }
         }
-         
 
         stage('Extract EC2 Public IP') {
+            when {
+                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
+            }
             steps {
-                script {
-                    env.PUBLIC_IP = sh(
-                        script: "cd terraform && terraform output -raw ec2_public_ip",
-                        returnStdout: true
-                    ).trim()
-                }
+                echo "Extracting public IP..."
+                // Add your script here
             }
         }
 
         stage('Generate Ansible Inventory') {
+            when {
+                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
+            }
             steps {
-                sh '''
-                    echo "[web]" > ansible/inventory.ini
-                    echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
-                '''
+                echo "Generating Ansible inventory..."
+                // Add your script here
             }
         }
 
         stage('Run Ansible Playbook') {
+            when {
+                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
+            }
             steps {
-                sh 'ansible-playbook -i ansible/inventory.ini ansible/playbook.yml'
+                echo "Running Ansible playbook..."
+                // Add your script here
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Deployment Successful!"
-        }
         failure {
-            echo "❌ Deployment Failed!"
+            echo '❌ Deployment Failed!'
+        }
+        success {
+            echo '✅ Deployment Successful!'
         }
     }
 }
