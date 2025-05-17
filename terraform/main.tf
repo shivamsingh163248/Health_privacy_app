@@ -1,7 +1,8 @@
 provider "aws" {
   region     = "us-east-1"
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  # Uncomment the following lines if you want to use access and secret keys directly
+  #access_key = var.aws_access_key
+  #secret_key = var.aws_secret_key
 }
 
 resource "aws_key_pair" "deployer" {
