@@ -79,3 +79,5 @@ terraform/.terraform/
 terraform/terraform.tfvars
 ansible/inventory.ini
 
+terraform/variables.tf
+variables.tf
