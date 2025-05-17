@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        TF_VAR_aws_access_key = credentials('aws-access-key')   // AWS Key from Jenkins Credentials
-        TF_VAR_aws_secret_key = credentials('aws-secret-key')   // AWS Secret from Jenkins Credentials
+        TF_VAR_aws_access_key = credentials('aws-access-key')
+        TF_VAR_aws_secret_key = credentials('aws-secret-key')
     }
 
     stages {
@@ -14,8 +14,8 @@ pipeline {
         }
 
         stage('Terraform Init & Apply') {
-            dir('terraform') {
-                steps {
+            steps {
+                dir('terraform') {
                     sh 'terraform init'
                     sh 'terraform apply -auto-approve'
                 }
