@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e  # Exit immediately if a command exits with a non-zero status
+
+echo "🚀 Starting Terraform Provisioning..."
+
+cd terraform
+terraform init
+terraform apply -auto-approve
+
+# Get public IP from Terraform output
+PUBLIC_IP=$(terraform output -raw ec2_public_ip)
+
+cd ../ansible
+
+echo "🌐 Creating Ansible Inventory with public IP: $PUBLIC_IP"
+
+# Create Ansible inventory file dynamically
+echo "[web]" > inventory.ini
+echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+
+echo "🛠️ Running Ansible Playbook..."
+ansible-playbook -i inventory.ini playbook.yml
+
+echo "✅ Deployment complete!"
+
