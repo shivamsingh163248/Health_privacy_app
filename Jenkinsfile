@@ -2,13 +2,12 @@ pipeline {
   agent any
 
   environment {
-    // These env vars will be used by Terraform if you define them in variables.tf
-    TF_VAR_aws_access_key = credentials('aws-access-key')
-    TF_VAR_aws_secret_key = credentials('aws-secret-key')
+    // Optional for later stages
+    ANSIBLE_HOST_KEY_CHECKING = 'False'
   }
 
   stages {
-    stage('Checkout') {
+    stage('Checkout Code') {
       steps {
         git branch: 'Ansible_terraform_jenkins',
             url: 'https://github.com/shivamsingh163248/Health_privacy_app.git'
@@ -23,10 +22,11 @@ pipeline {
             string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
           ]) {
             sh '''
+              export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+              export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
               terraform init
-              terraform apply -auto-approve \
-                -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
-                -var "aws_secret_key=$AWS_SECRET_ACCESS_KEY"
+              terraform apply -auto-approve
             '''
           }
         }
@@ -35,22 +35,18 @@ pipeline {
 
     stage('Generate Ansible Inventory') {
       steps {
-        dir('terraform') {
-          script {
-            def publicIp = sh(script: "terraform output -raw public_ip", returnStdout: true).trim()
-            writeFile file: '../ansible/inventory.ini', text: "[target]\n${publicIp} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa"
-          }
+        script {
+          def publicIp = sh(script: "terraform -chdir=terraform output -raw instance_public_ip", returnStdout: true).trim()
+          writeFile file: 'inventory.ini', text: """
+          ec2-instance ansible_host=${publicIp} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/id_rsa
+          """
         }
       }
     }
 
     stage('Run Ansible Playbook') {
       steps {
-        dir('ansible') {
-          sh '''
-            ansible-playbook -i inventory.ini setup.yml
-          '''
-        }
+        sh 'ansible-playbook -i inventory.ini ansible/playbook.yml'
       }
     }
   }
