@@ -2,6 +2,7 @@ pipeline {
   agent any
 
   environment {
+    // These env vars will be used by Terraform if you define them in variables.tf
     TF_VAR_aws_access_key = credentials('aws-access-key')
     TF_VAR_aws_secret_key = credentials('aws-secret-key')
   }
@@ -34,13 +35,22 @@ pipeline {
 
     stage('Generate Ansible Inventory') {
       steps {
-        // This will be skipped unless the Terraform stage succeeds
+        dir('terraform') {
+          script {
+            def publicIp = sh(script: "terraform output -raw public_ip", returnStdout: true).trim()
+            writeFile file: '../ansible/inventory.ini', text: "[target]\n${publicIp} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa"
+          }
+        }
       }
     }
 
-    stage('Ansible Playbook') {
+    stage('Run Ansible Playbook') {
       steps {
-        // Your ansible-playbook command here
+        dir('ansible') {
+          sh '''
+            ansible-playbook -i inventory.ini setup.yml
+          '''
+        }
       }
     }
   }
