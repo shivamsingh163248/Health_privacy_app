@@ -21,14 +21,14 @@ pipeline {
                 )]) {
                     dir('terraform') {
                         sh '''
-                            echo "🚀 Initializing Terraform..."
-                            terraform init
+    echo "🚀 Initializing Terraform..."
+    terraform init -no-color
 
-                            echo "📦 Applying Terraform configuration..."
-                            terraform apply -auto-approve \
-                                -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
-                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
-                        '''
+    echo "📦 Applying Terraform configuration..."
+    TF_LOG=INFO terraform apply -auto-approve -input=false -no-color \
+        -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
+        -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
+'''
                     }
                 }
             }
