@@ -1,30 +1,38 @@
 provider "aws" {
-  region     = "ap-south-1"  # Mumbai region (change as needed)
+  region     = "us-east-1"
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
 }
 
-resource "aws_key_pair" "jenkins_key" {
-  key_name   = "jenkins-key"
-  public_key = file("~/.ssh/id_rsa.pub")
+resource "aws_key_pair" "deployer" {
+  key_name   = "shivam-key"
+  public_key = file("~/.ssh/id_rsa.pub")  # Make sure this file exists
 }
 
-resource "aws_security_group" "jenkins_sg" {
-  name        = "jenkins-sg"
-  description = "Allow SSH and HTTP access"
+resource "aws_security_group" "docker_sg" {
+  name        = "docker-sg"
+  description = "Allow SSH, HTTP, and App inbound traffic"
 
   ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
+    description = "Allow HTTP"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # ⚠️ Open to all — restrict for production
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "HTTP"
-    from_port   = 80
-    to_port     = 80
+    description = "Allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow App Port (3000)"
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -37,34 +45,29 @@ resource "aws_security_group" "jenkins_sg" {
   }
 }
 
-resource "aws_instance" "jenkins_ec2" {
-  ami                    = "ami-0f5ee92e2d63afc18"  # Ubuntu 22.04 LTS for ap-south-1
+resource "aws_instance" "docker_server" {
+  ami                    = "ami-0c7217cdde317cfec"
   instance_type          = "t2.micro"
-  key_name               = aws_key_pair.jenkins_key.key_name
-  vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
+  key_name               = aws_key_pair.deployer.key_name
+  security_groups        = [aws_security_group.docker_sg.name]
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt update -y
+              apt install -y docker.io
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ubuntu
+              docker pull shivamsingh163248/health_privacy_app:v2
+              docker run -d -p 80:3000 --restart always shivamsingh163248/health_privacy_app:v2
+              EOF
 
   tags = {
-    Name = "jenkins-instance"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt update -y",
-      "sudo apt install docker.io -y",
-      "sudo systemctl start docker",
-      "sudo docker run -d -p 80:80 nginx"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("~/.ssh/id_rsa")
-      host        = self.public_ip
-    }
+    Name = "Docker-Health-App-Server"
   }
 }
 
-output "public_ip" {
-  value = aws_instance.jenkins_ec2.public_ip
-  description = "Public IP of the EC2 instance"
+output "ec2_public_ip" {
+  value       = aws_instance.docker_server.public_ip
+  description = "Public IP of your EC2 instance"
 }
