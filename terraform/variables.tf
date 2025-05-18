@@ -7,9 +7,5 @@ variable "aws_secret_key" {
   description = "AWS Secret Key"
   type        = string
 }
-variable "region" {
-  description = "AWS region"
-  type        = string
-}
 
 
