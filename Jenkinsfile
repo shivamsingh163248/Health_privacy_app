@@ -19,9 +19,12 @@ pipeline {
                     withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", 
                              "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}"]) {
                         sh '''
-                            terraform init
-                            terraform apply -auto-approve
-                        '''
+  terraform init
+  terraform apply -auto-approve \
+    -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
+    -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
+'''
+
                     }
                 }
             }
