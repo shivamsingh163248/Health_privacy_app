@@ -1,8 +1,6 @@
 pipeline {
     agent any
 
-    
-
     stages {
         stage('Checkout') {
             steps {
@@ -10,7 +8,7 @@ pipeline {
             }
         }
 
-        stage('Terraform Init & Apply') {
+        stage('Terraform Init & Plan') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'aws-creds',
@@ -22,10 +20,29 @@ pipeline {
                             echo "🚀 Initializing Terraform..."
                             terraform init -no-color
 
-                            echo "📦 Applying Terraform configuration..."
-                            terraform apply -auto-approve -input=false -no-color \
+                            echo "🧠 Planning Terraform changes..."
+                            terraform plan -no-color \
                                 -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
-                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}" 
+                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    dir('terraform') {
+                        sh '''
+                            echo "📦 Applying Terraform configuration..."
+                            terraform apply -auto-approve -input=false -no-color -parallelism=1 \
+                                -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
+                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}"
                         '''
                     }
                 }
