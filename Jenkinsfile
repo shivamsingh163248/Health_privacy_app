@@ -25,8 +25,7 @@ pipeline {
                             echo "📦 Applying Terraform configuration..."
                             terraform apply -auto-approve -input=false -no-color \
                                 -var="aws_access_key=${AWS_ACCESS_KEY_ID}" \
-                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}" \
-                                -var="region=${AWS_REGION}"
+                                -var="aws_secret_key=${AWS_SECRET_ACCESS_KEY}" 
                         '''
                     }
                 }
