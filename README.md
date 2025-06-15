@@ -403,4 +403,182 @@ Add these at the top of your README for project visibility:
 GitHub Repo: [shivamsingh163248/Health\_privacy\_app](https://github.com/shivamsingh163248/Health_privacy_app)
 
 
+# 🛡️ Health Privacy App - Docker Setup Guide
+
+This guide walks you through building and running the Health Privacy App using Docker on a Windows system.
+
+---
+
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.9-blue?logo=python)
+![Docker Pulls](https://img.shields.io/docker/pulls/shivamsingh163248/health_privacy_app?style=flat-square)
+
+---
+
+## ✅ Step-by-Step (On Windows PowerShell or CMD)
+
+### 🔧 1. Open PowerShell (or CMD) and Navigate to Your Project Folder
+
+```bash
+cd path\to\your\Health_privacy_app
+```
+
+Replace `path\to\your\Health_privacy_app` with the actual path to your project directory.
+
+### 🔨 2. Build the Docker Image
+
+```bash
+docker build -t health_privacy_app .
+```
+
+### 🚀 3. Run the Docker Container
+
+```bash
+docker run -d -p 3000:3000 --name health_app_container health_privacy_app
+```
+
+### 🌐 4. Access the Flask App in Your Browser
+
+```
+http://localhost:3000
+```
+
+### 🧲 5. Check Running Containers
+
+```bash
+docker ps
+```
+
+### 🚩 6. Stop and Remove the Container (Optional)
+
+```bash
+docker stop health_app_container
+
+docker rm health_app_container
+```
+
+### 📝 Bonus Tips
+
+Make sure your `app.py` runs the Flask server on all available network interfaces:
+
+```python
+app.run(host="0.0.0.0", port=3000)
+```
+
+---
+
+## 📦 Docker Compose Setup (Optional)
+
+```yaml
+version: '3.8'
+
+services:
+  health_app:
+    build: .
+    ports:
+      - "3000:3000"
+    container_name: health_app_container
+```
+
+```bash
+docker-compose up -d
+
+docker-compose down
+```
+
+---
+
+## 📤 Push to Docker Hub
+
+```bash
+docker login
+
+docker tag health_privacy_app shivamsingh163248/health_privacy_app
+
+docker push shivamsingh163248/health_privacy_app
+```
+
+---
+
+## ⚙️ CI/CD Integration
+
+### 🔁 GitHub Actions
+
+Create `.github/workflows/docker.yml`:
+
+```yaml
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+    - name: Build Docker Image
+      run: docker build -t shivamsingh163248/health_privacy_app .
+
+    - name: Push Docker Image
+      run: docker push shivamsingh163248/health_privacy_app
+```
+
+Add secrets in your repo: `DOCKER_USERNAME`, `DOCKER_PASSWORD`
+
+### 🔁 Jenkins Pipeline Example (Jenkinsfile)
+
+```groovy
+pipeline {
+  agent any
+
+  stages {
+    stage('Clone') {
+      steps {
+        git 'https://github.com/shivamsingh163248/Health_privacy_app.git'
+      }
+    }
+    stage('Build Docker Image') {
+      steps {
+        script {
+          docker.build("shivamsingh163248/health_privacy_app")
+        }
+      }
+    }
+    stage('Push to Docker Hub') {
+      steps {
+        withDockerRegistry([ credentialsId: 'dockerhub-credentials', url: '' ]) {
+          script {
+            docker.image("shivamsingh163248/health_privacy_app").push()
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## 🖼️ Architecture Diagram
+
+![App Architecture](https://raw.githubusercontent.com/shivamsingh163248/Health_privacy_app/main/assets/architecture.png)
+
+This shows the container-based deployment architecture for the Health Privacy App.
+
+> Note: Make sure to upload your `architecture.png` under an `assets` folder in your GitHub repo.
+
+---
+
+## 🔗 Source
+
+GitHub Repo: [shivamsingh163248/Health\_privacy\_app](https://github.com/shivamsingh163248/Health_privacy_app)
 
