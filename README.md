@@ -233,3 +233,174 @@ This is required so that Docker can bind to port 3000 properly from outside the 
 GitHub Repo: [shivamsingh163248/Health\_privacy\_app](https://github.com/shivamsingh163248/Health_privacy_app)
 
 
+# 🛡️ Health Privacy App - Docker Setup Guide
+
+This guide walks you through building and running the Health Privacy App using Docker on a Windows system.
+
+---
+
+## ✅ Step-by-Step (On Windows PowerShell or CMD)
+
+---
+
+### 🔧 1. Open PowerShell (or CMD) and Navigate to Your Project Folder
+
+```bash
+cd path\to\your\Health_privacy_app
+```
+
+Replace `path\to\your\Health_privacy_app` with the actual path to your project directory.
+
+---
+
+### 🔨 2. Build the Docker Image
+
+```bash
+docker build -t health_privacy_app .
+```
+
+**Explanation:**
+
+* `-t` tags your image with a name (`health_privacy_app`)
+* `.` tells Docker to use the `Dockerfile` in the current directory
+
+---
+
+### 🚀 3. Run the Docker Container
+
+```bash
+docker run -d -p 3000:3000 --name health_app_container health_privacy_app
+```
+
+**Explanation:**
+
+* `-d`: Run in detached mode (background). Without `-d`, the app runs in foreground, and you'll see logs. If the container is interrupted (Ctrl+C), it stops and app becomes inaccessible.
+* `-p 3000:3000`: Maps port 3000 on your host to port 3000 in the container
+* `--name health_app_container`: Gives your container a name
+* `health_privacy_app`: Name of the Docker image you built
+
+---
+
+### 🌐 4. Access the Flask App in Your Browser
+
+Open your browser and go to:
+
+```
+http://localhost:3000
+```
+
+---
+
+### 🧲 5. Check Running Containers
+
+To check if the container is running:
+
+```bash
+docker ps
+```
+
+To view logs (helpful for debugging):
+
+```bash
+docker logs health_app_container
+```
+
+---
+
+### 🚩 6. Stop and Remove the Container (Optional)
+
+To stop the container:
+
+```bash
+docker stop health_app_container
+```
+
+To remove the container:
+
+```bash
+docker rm health_app_container
+```
+
+---
+
+### 📝 Bonus Tips
+
+Make sure your `app.py` runs the Flask server on all available network interfaces:
+
+```python
+app.run(host="0.0.0.0", port=3000)
+```
+
+This is required so that Docker can bind to port 3000 properly from outside the container.
+
+---
+
+## 📦 Docker Compose Setup (Optional)
+
+Create a `docker-compose.yml` file in the root of your project:
+
+```yaml
+version: '3.8'
+
+services:
+  health_app:
+    build: .
+    ports:
+      - "3000:3000"
+    container_name: health_app_container
+```
+
+Then run:
+
+```bash
+docker-compose up -d
+```
+
+To stop and remove:
+
+```bash
+docker-compose down
+```
+
+---
+
+## 📤 Push to Docker Hub
+
+1. **Login to Docker Hub**:
+
+```bash
+docker login
+```
+
+2. **Tag your image**:
+
+```bash
+docker tag health_privacy_app your_dockerhub_username/health_privacy_app
+```
+
+3. **Push the image**:
+
+```bash
+docker push your_dockerhub_username/health_privacy_app
+```
+
+---
+
+## 🖼️ GitHub Badges
+
+Add these at the top of your README for project visibility:
+
+```markdown
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.9-blue?logo=python)
+```
+
+---
+
+## 🔗 Source
+
+GitHub Repo: [shivamsingh163248/Health\_privacy\_app](https://github.com/shivamsingh163248/Health_privacy_app)
+
+
+
