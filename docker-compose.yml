@@ -1,0 +1,11 @@
+
+
+services:
+  health_app:
+    container_name: health_app_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    #restart: unless-stopped
